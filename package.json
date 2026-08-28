@@ -1,0 +1,22 @@
+{
+  "name": "banker-certification-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Hodnoticí nástroj pro závěrečnou certifikaci bankéře připravený pro GitHub Pages.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.5",
+    "gh-pages": "^5.0.0",
+    "vite": "^8.2.1"
+  },
+  "homepage": "https://bdonatova-cen66443.github.io/banker-certification-app/"
+}
