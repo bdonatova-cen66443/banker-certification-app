@@ -100,6 +100,8 @@ const scale = [
   },
 ];
 
+const scaleByValue = Object.fromEntries(scale.map((entry) => [entry.value, entry]));
+
 const emptyState = {
   candidate: '',
   evaluator: '',
@@ -188,217 +190,374 @@ function App() {
   }
 
   return (
-    <div className="app-shell">
-      <header className="top-panel">
-        <div className="title-area">
-          <p className="eyebrow">Závěrečná certifikace bankéře</p>
-          <h1>Hodnocení poradenského rozhovoru</h1>
-        </div>
-        <div className="form-grid">
-          <label>
-            NOVÁČEK
-            <input
-              value={state.candidate}
-              onChange={(event) => updateField('candidate', event.target.value)}
-              placeholder="Jméno a příjmení"
-            />
-          </label>
-          <label>
-            HODNOTITEL
-            <input
-              value={state.evaluator}
-              onChange={(event) => updateField('evaluator', event.target.value)}
-              placeholder="Jméno a příjmení"
-            />
-          </label>
-          <label>
-            SCÉNÁŘ FIT
-            <select value={state.scenario} onChange={(event) => updateField('scenario', event.target.value)}>
-              <option value="A">Scénář A</option>
-              <option value="B">Scénář B</option>
-            </select>
-          </label>
-        </div>
-      </header>
+    <>
+      <div className="app-shell screen-only">
+        <header className="top-panel">
+          <div className="title-area">
+            <p className="eyebrow">Závěrečná certifikace bankéře</p>
+            <h1>Hodnocení poradenského rozhovoru</h1>
+          </div>
+          <div className="form-grid">
+            <label>
+              NOVÁČEK
+              <input
+                value={state.candidate}
+                onChange={(event) => updateField('candidate', event.target.value)}
+                placeholder="Jméno a příjmení"
+              />
+            </label>
+            <label>
+              HODNOTITEL
+              <input
+                value={state.evaluator}
+                onChange={(event) => updateField('evaluator', event.target.value)}
+                placeholder="Jméno a příjmení"
+              />
+            </label>
+            <label>
+              SCÉNÁŘ FIT
+              <select value={state.scenario} onChange={(event) => updateField('scenario', event.target.value)}>
+                <option value="A">Scénář A</option>
+                <option value="B">Scénář B</option>
+              </select>
+            </label>
+          </div>
+        </header>
 
-      <section className="dashboard-panel">
-        <div className="dashboard-grid">
-          <div className="stat-card">
-            <span className="stat-label">PRŮBĚŽNÉ PLNĚNÍ</span>
-            <strong>{percent} %</strong>
+        <section className="dashboard-panel">
+          <div className="dashboard-grid">
+            <div className="stat-card">
+              <span className="stat-label">PRŮBĚŽNÉ PLNĚNÍ</span>
+              <strong>{percent} %</strong>
+            </div>
+            <div className="stat-card">
+              <span className="stat-label">VYHODNOCENO</span>
+              <strong>{completed} / 12</strong>
+            </div>
+            <div className="stat-card">
+              <span className="stat-label">SPLNĚNÍ STANDARDU</span>
+              <strong>{standardPoints} / {maxPoints} bodů</strong>
+              <span className="bonus-points">Bonus za „NAD OČEKÁVÁNÍ“: +{bonusPoints} bodů</span>
+            </div>
+            <div className="stat-card">
+              <span className="stat-label">STAV HODNOCENÍ</span>
+              <strong>{completed === 12 ? 'Kompletní' : 'Probíhá'}</strong>
+            </div>
           </div>
-          <div className="stat-card">
-            <span className="stat-label">VYHODNOCENO</span>
-            <strong>{completed} / 12</strong>
+          <div className="progress-bar-shell" aria-label="Průběh vyhodnocení">
+            <div className="progress-labels">
+              <span>{completed} / 12</span>
+              <span>{percent}%</span>
+            </div>
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: `${(completed / 12) * 100}%` }} />
+            </div>
           </div>
-          <div className="stat-card">
-            <span className="stat-label">SPLNĚNÍ STANDARDU</span>
-            <strong>{standardPoints} / {maxPoints} bodů</strong>
-            <span className="bonus-points">Bonus za „NAD OČEKÁVÁNÍ“: +{bonusPoints} bodů</span>
-          </div>
-          <div className="stat-card">
-            <span className="stat-label">STAV HODNOCENÍ</span>
-            <strong>{completed === 12 ? 'Kompletní' : 'Probíhá'}</strong>
-          </div>
-        </div>
-        <div className="progress-bar-shell" aria-label="Průběh vyhodnocení">
-          <div className="progress-labels">
-            <span>{completed} / 12</span>
-            <span>{percent}%</span>
-          </div>
-          <div className="progress-track">
-            <div className="progress-fill" style={{ width: `${(completed / 12) * 100}%` }} />
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <main className="content-grid">
-        <section className="form-section">
-          {criteria.map((item) => {
-            const selected = state.ratings[item.id];
-            return (
-              <article key={item.id} className="criterion-card">
-                <div className="criterion-header">
-                  <div>
-                    <h2>{item.title}</h2>
-                    <span className="stat-label">VÝSLEDNÉ HODNOCENÍ</span>
+        <main className="content-grid">
+          <section className="form-section">
+            {criteria.map((item) => {
+              const selected = state.ratings[item.id];
+              return (
+                <article key={item.id} className="criterion-card">
+                  <div className="criterion-header">
+                    <div>
+                      <h2>{item.title}</h2>
+                      <span className="stat-label">VÝSLEDNÉ HODNOCENÍ</span>
+                    </div>
                   </div>
-                </div>
-                <div className="scale-row">
-                  {scale.map((entry) => {
-                    const isActive = selected === entry.value;
-                    return (
-                      <button
-                        key={entry.value}
-                        type="button"
-                        className={`scale-button ${isActive ? 'active' : ''}`}
-                        onClick={() => updateRating(item.id, entry.value)}
-                        aria-pressed={isActive}
-                      >
-                        <span className="value">{entry.value}</span>
-                        <span className="label">{entry.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <label className="comment-box">
-                  Komentář hodnotitele
+                  <div className="scale-row">
+                    {scale.map((entry) => {
+                      const isActive = selected === entry.value;
+                      return (
+                        <button
+                          key={entry.value}
+                          type="button"
+                          className={`scale-button ${isActive ? 'active' : ''}`}
+                          onClick={() => updateRating(item.id, entry.value)}
+                          aria-pressed={isActive}
+                        >
+                          <span className="value">{entry.value}</span>
+                          <span className="label">{entry.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <label className="comment-box">
+                    Komentář hodnotitele
+                    <textarea
+                      value={state.comments[item.id]}
+                      onChange={(event) => updateComment(item.id, event.target.value)}
+                      placeholder="Co se povedlo, co chybělo, konkrétní příklad…"
+                    />
+                  </label>
+                </article>
+              );
+            })}
+          </section>
+
+          <section className="summary-panel">
+            <section className="auto-summary">
+              <h2>AUTOMATICKÝ PŘEHLED</h2>
+              {completed === 0 ? (
+                <p className="empty-state">Zatím není co vyhodnotit.</p>
+              ) : (
+                <>
+                  <div className="summary-group">
+                    <h3>NEJSILNĚJŠÍ OBLASTI</h3>
+                    <div className="summary-list">
+                      {topAreas.map((item) => (
+                        <div key={item.id} className="summary-item">
+                          <span>{item.title}</span>
+                          <strong>{state.ratings[item.id]} / 3</strong>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="summary-group">
+                    <h3>OBLASTI K ROZVOJI</h3>
+                    <div className="summary-list">
+                      {bottomAreas.map((item) => (
+                        <div key={item.id} className="summary-item">
+                          <span>{item.title}</span>
+                          <strong>{state.ratings[item.id]} / 3</strong>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </section>
+
+            <section className="start-stop-continue">
+              <h2>START – STOP – CONTINUE</h2>
+              <div className="ssc-grid">
+                <label>
+                  <span>START</span>
                   <textarea
-                    value={state.comments[item.id]}
-                    onChange={(event) => updateComment(item.id, event.target.value)}
-                    placeholder="Co se povedlo, co chybělo, konkrétní příklad…"
+                    value={state.start}
+                    onChange={(event) => updateField('start', event.target.value)}
+                    placeholder="Co má bankéř začít dělat?"
                   />
                 </label>
+                <label>
+                  <span>STOP</span>
+                  <textarea
+                    value={state.stop}
+                    onChange={(event) => updateField('stop', event.target.value)}
+                    placeholder="Co má bankéř přestat dělat?"
+                  />
+                </label>
+                <label>
+                  <span>CONTINUE</span>
+                  <textarea
+                    value={state.continue}
+                    onChange={(event) => updateField('continue', event.target.value)}
+                    placeholder="V čem má bankéř pokračovat?"
+                  />
+                </label>
+              </div>
+            </section>
+
+            <section className="final-summary">
+              <h2>ZÁVĚREČNÉ SHRNUTÍ</h2>
+              <label>
+                <span>SILNÉ STRÁNKY – SHRNUTÍ</span>
+                <textarea
+                  value={state.strengths}
+                  onChange={(event) => updateField('strengths', event.target.value)}
+                  placeholder="Silné stránky…"
+                />
+              </label>
+              <label>
+                <span>ROZVOJOVÉ OBLASTI – SHRNUTÍ</span>
+                <textarea
+                  value={state.development}
+                  onChange={(event) => updateField('development', event.target.value)}
+                  placeholder="Rozvojové oblasti…"
+                />
+              </label>
+              <label>
+                <span>CELKOVÉ DOPORUČENÍ</span>
+                <select
+                  value={state.recommendation}
+                  onChange={(event) => updateField('recommendation', event.target.value)}
+                >
+                  <option value="Připraven/a k samostatné práci">Připraven/a k samostatné práci</option>
+                  <option value="Připraven/a s rozvojovým doporučením">Připraven/a s rozvojovým doporučením</option>
+                  <option value="Potřebuje další rozvoj před samostatnou prací">Potřebuje další rozvoj před samostatnou prací</option>
+                </select>
+              </label>
+            </section>
+
+            <div className="actions-row">
+              <button className="secondary-button" type="button" onClick={resetForm}>
+                NOVÉ HODNOCENÍ
+              </button>
+              <button className="primary-button" type="button" onClick={() => window.print()}>
+                VYTISKNOUT / ULOŽIT JAKO PDF
+              </button>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <div className="print-only print-document">
+        <header className="print-header">
+          <p className="print-kicker">ZÁVĚREČNÁ CERTIFIKACE BANKÉŘE</p>
+          <h1>Hodnocení poradenského rozhovoru</h1>
+        </header>
+
+        <section className="print-meta-grid">
+          <div className="print-meta-card">
+            <span>Jméno nováčka</span>
+            <strong>{state.candidate || '—'}</strong>
+          </div>
+          <div className="print-meta-card">
+            <span>Hodnotitel</span>
+            <strong>{state.evaluator || '—'}</strong>
+          </div>
+          <div className="print-meta-card">
+            <span>Scénář FIT</span>
+            <strong>{state.scenario || 'A'}</strong>
+          </div>
+        </section>
+
+        <section className="print-summary-strip">
+          <div className="print-stat">
+            <span>PRŮBĚŽNÉ PLNĚNÍ</span>
+            <strong>{percent} %</strong>
+          </div>
+          <div className="print-stat">
+            <span>VYHODNOCENO</span>
+            <strong>{completed} / 12</strong>
+          </div>
+          <div className="print-stat">
+            <span>SPLNĚNÍ STANDARDU</span>
+            <strong>{standardPoints} / {maxPoints} bodů</strong>
+          </div>
+          <div className="print-stat">
+            <span>BONUS</span>
+            <strong>+{bonusPoints} bodů</strong>
+          </div>
+          <div className="print-stat recommendation-stat">
+            <span>CELKOVÉ DOPORUČENÍ</span>
+            <strong>{state.recommendation}</strong>
+          </div>
+        </section>
+
+        <section className="print-areas">
+          {criteria.map((item) => {
+            const selected = state.ratings[item.id];
+            const selectedEntry = scaleByValue[selected] ?? null;
+            const comment = state.comments[item.id]?.trim();
+
+            return (
+              <article key={item.id} className="print-area-card">
+                <div className="print-area-header">
+                  <div className="print-area-number">{String(criteria.indexOf(item) + 1).padStart(2, '0')}</div>
+                  <div className="print-area-copy">
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </div>
+                </div>
+
+                <div className="print-area-result">
+                  <span>Výsledné hodnocení</span>
+                  {selectedEntry ? (
+                    <strong className={`rating-badge rating-${selectedEntry.value}`}>
+                      {selectedEntry.value} – {selectedEntry.label}
+                    </strong>
+                  ) : (
+                    <strong className="rating-badge rating-empty">—</strong>
+                  )}
+                </div>
+
+                {comment ? (
+                  <div className="print-area-comment">
+                    <span>Komentář:</span>
+                    <p>{comment}</p>
+                  </div>
+                ) : (
+                  <div className="print-area-comment muted">
+                    <span>Komentář:</span>
+                    <p>—</p>
+                  </div>
+                )}
               </article>
             );
           })}
         </section>
 
-        <section className="summary-panel">
-          <section className="auto-summary">
-            <h2>AUTOMATICKÝ PŘEHLED</h2>
-            {completed === 0 ? (
-              <p className="empty-state">Zatím není co vyhodnotit.</p>
-            ) : (
-              <>
-                <div className="summary-group">
-                  <h3>NEJSILNĚJŠÍ OBLASTI</h3>
-                  <div className="summary-list">
-                    {topAreas.map((item) => (
-                      <div key={item.id} className="summary-item">
-                        <span>{item.title}</span>
-                        <strong>{state.ratings[item.id]} / 3</strong>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="summary-group">
-                  <h3>OBLASTI K ROZVOJI</h3>
-                  <div className="summary-list">
-                    {bottomAreas.map((item) => (
-                      <div key={item.id} className="summary-item">
-                        <span>{item.title}</span>
-                        <strong>{state.ratings[item.id]} / 3</strong>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-          </section>
+        <section className="print-compact-panels">
+          <div className="print-summary-box">
+            <h3>NEJSILNĚJŠÍ OBLASTI</h3>
+            <ul>
+              {topAreas.length === 0 ? (
+                <li>—</li>
+              ) : (
+                topAreas.map((item) => (
+                  <li key={item.id}>
+                    <span>{item.title}</span>
+                    <strong>{state.ratings[item.id]} / 3</strong>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
 
-          <section className="start-stop-continue">
-            <h2>START – STOP – CONTINUE</h2>
-            <div className="ssc-grid">
-              <label>
-                <span>START</span>
-                <textarea
-                  value={state.start}
-                  onChange={(event) => updateField('start', event.target.value)}
-                  placeholder="Co má bankéř začít dělat?"
-                />
-              </label>
-              <label>
-                <span>STOP</span>
-                <textarea
-                  value={state.stop}
-                  onChange={(event) => updateField('stop', event.target.value)}
-                  placeholder="Co má bankéř přestat dělat?"
-                />
-              </label>
-              <label>
-                <span>CONTINUE</span>
-                <textarea
-                  value={state.continue}
-                  onChange={(event) => updateField('continue', event.target.value)}
-                  placeholder="V čem má bankéř pokračovat?"
-                />
-              </label>
-            </div>
-          </section>
-
-          <section className="final-summary">
-            <h2>ZÁVĚREČNÉ SHRNUTÍ</h2>
-            <label>
-              <span>SILNÉ STRÁNKY – SHRNUTÍ</span>
-              <textarea
-                value={state.strengths}
-                onChange={(event) => updateField('strengths', event.target.value)}
-                placeholder="Silné stránky…"
-              />
-            </label>
-            <label>
-              <span>ROZVOJOVÉ OBLASTI – SHRNUTÍ</span>
-              <textarea
-                value={state.development}
-                onChange={(event) => updateField('development', event.target.value)}
-                placeholder="Rozvojové oblasti…"
-              />
-            </label>
-            <label>
-              <span>CELKOVÉ DOPORUČENÍ</span>
-              <select
-                value={state.recommendation}
-                onChange={(event) => updateField('recommendation', event.target.value)}
-              >
-                <option value="Připraven/a k samostatné práci">Připraven/a k samostatné práci</option>
-                <option value="Připraven/a s rozvojovým doporučením">Připraven/a s rozvojovým doporučením</option>
-                <option value="Potřebuje další rozvoj před samostatnou prací">Potřebuje další rozvoj před samostatnou prací</option>
-              </select>
-            </label>
-          </section>
-
-          <div className="actions-row">
-            <button className="secondary-button" type="button" onClick={resetForm}>
-              NOVÉ HODNOCENÍ
-            </button>
-            <button className="primary-button" type="button" onClick={() => window.print()}>
-              VYTISKNOUT / ULOŽIT JAKO PDF
-            </button>
+          <div className="print-summary-box">
+            <h3>OBLASTI K ROZVOJI</h3>
+            <ul>
+              {bottomAreas.length === 0 ? (
+                <li>—</li>
+              ) : (
+                bottomAreas.map((item) => (
+                  <li key={item.id}>
+                    <span>{item.title}</span>
+                    <strong>{state.ratings[item.id]} / 3</strong>
+                  </li>
+                ))
+              )}
+            </ul>
           </div>
         </section>
-      </main>
-    </div>
+
+        <section className="print-ssc">
+          <h3>START – STOP – CONTINUE</h3>
+          <div className="print-ssc-grid">
+            <div className="print-ssc-item">
+              <strong>START</strong>
+              <p>{state.start || '—'}</p>
+            </div>
+            <div className="print-ssc-item">
+              <strong>STOP</strong>
+              <p>{state.stop || '—'}</p>
+            </div>
+            <div className="print-ssc-item">
+              <strong>CONTINUE</strong>
+              <p>{state.continue || '—'}</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="print-final-summary">
+          <div className="print-final-item">
+            <h3>SILNÉ STRÁNKY</h3>
+            <p>{state.strengths || '—'}</p>
+          </div>
+          <div className="print-final-item">
+            <h3>ROZVOJOVÉ OBLASTI</h3>
+            <p>{state.development || '—'}</p>
+          </div>
+          <div className="print-final-item">
+            <h3>CELKOVÉ DOPORUČENÍ</h3>
+            <p>{state.recommendation}</p>
+          </div>
+        </section>
+      </div>
+    </>
   );
 }
 

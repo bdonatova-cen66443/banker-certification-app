@@ -1,7 +1,11 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { viteSingleFile } from 'vite-plugin-singlefile'
 
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/banker-certification-app/' : '/',
-  plugins: [react()],
-});
+  plugins: [react(), viteSingleFile()],
+  build: {
+    assetsInlineLimit: 100000000,
+    cssCodeSplit: false,
+  },
+})

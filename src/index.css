@@ -39,6 +39,10 @@ button {
   padding: 24px 20px 40px;
 }
 
+.print-document {
+  display: none;
+}
+
 .top-panel {
   position: sticky;
   top: 0;
@@ -416,71 +420,412 @@ select {
   }
 }
 
+@page {
+  size: A4 portrait;
+  margin: 10mm 12mm;
+}
+
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
+
+  html,
   body {
-    background: #fff;
-    color: #111;
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 10.5pt;
+    line-height: 1.42;
   }
 
-  .app-shell {
-    padding: 16px;
-    max-width: 100%;
+  body * {
+    visibility: hidden;
   }
 
-  header,
-  .dashboard-panel,
-  .criterion-card,
-  .auto-summary,
-  .start-stop-continue,
-  .final-summary {
-    box-shadow: none;
-    border: 1px solid #d0d5dd;
-    background: #fff;
+  .print-document,
+  .print-document * {
+    visibility: visible;
   }
 
+  .screen-only,
+  .screen-only *,
   .top-panel,
+  .dashboard-panel,
+  .content-grid,
+  .form-section,
+  .summary-panel,
   .actions-row,
-  .scale-button,
-  .form-grid label:nth-child(1),
-  .form-grid label:nth-child(2),
-  .form-grid label:nth-child(3),
   .primary-button,
   .secondary-button,
   button,
+  input,
+  select,
+  textarea,
+  .progress-bar-shell,
+  .progress-track,
+  .progress-fill,
+  .scale-row,
+  .scale-button,
+  .comment-box,
   .summary-item,
-  .progress-track {
+  .title-area,
+  .form-grid,
+  .stat-card,
+  .auto-summary,
+  .start-stop-continue,
+  .final-summary,
+  .criterion-card,
+  .criteria,
+  .summary-group,
+  .summary-list,
+  .ssc-grid,
+  .final-summary label,
+  .auto-summary h2,
+  .start-stop-continue h2,
+  .final-summary h2 {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+  }
+
+  .print-document {
+    display: block !important;
+    width: 100%;
+    max-width: 100%;
+    color: #111;
+    background: #fff;
+    margin: 0;
+    padding: 0;
+    page-break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-header {
+    margin: 0 0 10px;
+    padding: 0;
     page-break-inside: avoid;
   }
 
-  .scale-button {
-    border: 1px solid #d0d5dd;
+  .print-kicker {
+    margin: 0 0 3px;
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #2f3a4a;
   }
 
-  .actions-row,
-  .secondary-button,
-  .primary-button {
-    display: none;
-  }
-
-  .form-grid,
-  .scale-row,
-  .ssc-grid {
-    display: block;
-  }
-
-  .scale-button {
-    break-inside: avoid;
-  }
-
-  h1,
-  h2,
-  h3,
-  .eyebrow {
+  .print-header h1 {
+    margin: 0;
+    font-size: 22pt;
+    line-height: 1.15;
     color: #111;
   }
 
-  .summary-item,
-  .stat-card {
+  .print-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 12px 0 14px;
+    page-break-inside: avoid;
+  }
+
+  .print-meta-card {
+    border: 1px solid #d5d9e0;
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: grid;
+    gap: 4px;
+  }
+
+  .print-meta-card span,
+  .print-stat span,
+  .print-area-result span,
+  .print-area-comment span,
+  .print-final-item h3,
+  .print-summary-box h3,
+  .print-ssc h3 {
+    font-size: 8.5pt;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #4b5563;
+  }
+
+  .print-meta-card strong,
+  .print-stat strong,
+  .print-area-result strong,
+  .print-final-item p,
+  .print-ssc-item p,
+  .print-summary-box li,
+  .print-area-comment p {
+    color: #111;
+    font-size: 10.5pt;
+  }
+
+  .print-summary-strip {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+  }
+
+  .print-stat {
+    border: 1px solid #d5d9e0;
+    border-radius: 8px;
+    background: #f8fafc;
+    padding: 8px 10px;
+    display: grid;
+    gap: 4px;
+  }
+
+  .recommendation-stat strong {
+    font-size: 9pt;
+    line-height: 1.3;
+  }
+
+  .print-areas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .print-area-card {
+    border: 1px solid #d5d9e0;
+    border-radius: 10px;
+    padding: 10px 11px;
+    background: #fff;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    display: grid;
+    gap: 8px;
+  }
+
+  .print-area-header {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 8px;
+    align-items: start;
+  }
+
+  .print-area-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #edf2ff;
+    color: #23366c;
+    font-size: 9pt;
+    font-weight: 700;
+  }
+
+  .print-area-copy h3 {
+    margin: 0 0 4px;
+    font-size: 10.5pt;
+    line-height: 1.3;
+    color: #111;
+  }
+
+  .print-area-copy p {
+    margin: 0;
+    font-size: 8.5pt;
+    color: #4b5563;
+    line-height: 1.45;
+  }
+
+  .print-area-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border-top: 1px solid #eef2f7;
+    padding-top: 8px;
+  }
+
+  .rating-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 8.6pt;
+    line-height: 1.2;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+
+  .rating-0 {
+    background: #fef2f2;
+    border-color: #fbcaca;
+    color: #991b1b;
+  }
+
+  .rating-1 {
+    background: #fff7ed;
+    border-color: #fdba74;
+    color: #9a4d00;
+  }
+
+  .rating-2 {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #166534;
+  }
+
+  .rating-3 {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
+  }
+
+  .rating-empty {
+    background: #f3f4f6;
+    color: #6b7280;
     border-color: #d1d5db;
+  }
+
+  .print-area-comment {
+    border-top: 1px solid #eef2f7;
+    padding-top: 8px;
+    display: grid;
+    gap: 4px;
+  }
+
+  .print-area-comment span {
+    font-weight: 700;
+  }
+
+  .print-area-comment p {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .muted p {
+    color: #6b7280;
+  }
+
+  .print-compact-panels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+  }
+
+  .print-summary-box {
+    border: 1px solid #d5d9e0;
+    border-radius: 10px;
+    background: #fff;
+    padding: 10px 11px;
+  }
+
+  .print-summary-box h3 {
+    margin: 0 0 8px;
+  }
+
+  .print-summary-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 6px;
+  }
+
+  .print-summary-box li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 9pt;
+    line-height: 1.35;
+  }
+
+  .print-summary-box li span {
+    max-width: 80%;
+  }
+
+  .print-ssc {
+    border: 1px solid #d5d9e0;
+    border-radius: 10px;
+    background: #fff;
+    padding: 10px 11px;
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+  }
+
+  .print-ssc h3 {
+    margin: 0 0 8px;
+  }
+
+  .print-ssc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .print-ssc-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fafbfc;
+    padding: 8px 9px;
+    display: grid;
+    gap: 6px;
+  }
+
+  .print-ssc-item strong {
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #374151;
+  }
+
+  .print-ssc-item p {
+    margin: 0;
+    white-space: pre-wrap;
+    min-height: 38px;
+  }
+
+  .print-final-summary {
+    border: 1px solid #d5d9e0;
+    border-radius: 10px;
+    background: #fff;
+    padding: 10px 11px;
+    display: grid;
+    gap: 10px;
+    page-break-inside: avoid;
+  }
+
+  .print-final-item h3 {
+    margin: 0 0 5px;
+  }
+
+  .print-final-item p {
+    margin: 0;
+    white-space: pre-wrap;
+  }
+
+  .print-document {
+    display: block;
+  }
+
+  .app-shell {
+    display: none !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
   }
 }
